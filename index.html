@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kids Color Fun 🎨</title>
+  <style>
+    :root {
+      --bg: #fff8e7;
+      --primary: #ff6b6b;
+      --secondary: #4ecdc4;
+      --accent: #ffe66d;
+      --text: #2d3436;
+      --soft: #ffeaa7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #fff8e7 0%, #ffeaa7 50%, #fab1a0 100%);
+      min-height: 100vh;
+      color: var(--text);
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+      padding: 12px 16px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      letter-spacing: 1px;
+    }
+
+    header p {
+      color: rgba(255,255,255,0.9);
+      font-size: 0.85rem;
+      margin-top: 2px;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 10px;
+      gap: 10px;
+    }
+
+    /* Gallery */
+    .gallery {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 8px 4px;
+      scrollbar-width: thin;
+    }
+
+    .gallery::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .gallery-item {
+      flex: 0 0 auto;
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      background: white;
+      border: 3px solid #ddd;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .gallery-item:hover, .gallery-item.active {
+      border-color: var(--primary);
+      transform: scale(1.08);
+      box-shadow: 0 6px 16px rgba(255,107,107,0.3);
+    }
+
+    .gallery-item span {
+      font-size: 1.8rem;
+    }
+
+    /* Canvas area */
+    .canvas-wrap {
+      flex: 1;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      position: relative;
+      overflow: hidden;
+      border: 4px solid #fff;
+    }
+
+    #drawing {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 65vh;
+      touch-action: none;
+    }
+
+    #drawing svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #drawing path,
+    #drawing circle,
+    #drawing ellipse,
+    #drawing rect,
+    #drawing polygon {
+      cursor: pointer;
+      transition: fill 0.12s ease;
+    }
+
+    #drawing .outline {
+      pointer-events: none;
+      fill: none !important;
+      stroke: #222 !important;
+      stroke-width: 2.5;
+    }
+
+    /* Controls */
+    .controls {
+      background: white;
+      border-radius: 20px;
+      padding: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .palette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .color-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .color-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .color-btn.active {
+      border-color: #222;
+      transform: scale(1.2);
+      box-shadow: 0 0 0 3px white, 0 0 0 5px #222;
+    }
+
+    .tools {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .tool-btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    }
+
+    .tool-btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn-clear { background: #ff6b6b; color: white; }
+    .btn-undo { background: #feca57; color: #333; }
+    .btn-download { background: #1dd1a1; color: white; }
+    .btn-random { background: #a29bfe; color: white; }
+    .btn-sound { background: #74b9ff; color: white; }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 0.75rem;
+      color: #636e72;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #2ecc71;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Confetti */
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      top: -20px;
+      z-index: 200;
+      pointer-events: none;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 500px) {
+      header h1 { font-size: 1.3rem; }
+      .gallery-item { width: 62px; height: 62px; }
+      .gallery-item span { font-size: 1.5rem; }
+      .color-btn { width: 34px; height: 34px; }
+      .tool-btn { padding: 8px 12px; font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎨 Kids Color Fun</h1>
+    <p>Pick a picture • Choose a color • Tap to fill!</p>
+  </header>
+
+  <div class="main">
+    <div class="gallery" id="gallery"></div>
+
+    <div class="canvas-wrap">
+      <div id="drawing"></div>
+    </div>
+
+    <div class="controls">
+      <div class="palette" id="palette"></div>
+      <div class="tools">
+        <button class="tool-btn btn-undo" onclick="undo()">↩️ Undo</button>
+        <button class="tool-btn btn-clear" onclick="clearColors()">🧹 Clear</button>
+        <button class="tool-btn btn-random" onclick="randomColors()">🎲 Surprise</button>
+        <button class="tool-btn btn-download" onclick="downloadImage()">💾 Save</button>
+        <button class="tool-btn btn-sound" id="soundBtn" onclick="toggleSound()">🔊 Sound</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Made with ❤️ for little artists • 20 fun pictures to color!
+  </footer>
+
+  <div class="toast" id="toast">Saved! 🎉</div>
+
+  <script>
+    // ========== SOUND ENGINE ==========
+    let soundOn = true;
+    let audioCtx = null;
+
+    function getAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
+
+    function playTone(freq, duration, type = 'sine', volume = 0.15) {
+      if (!soundOn) return;
+      try {
+        const ctx = getAudio();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(volume, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playPop() {
+      playTone(600 + Math.random() * 300, 0.08, 'triangle', 0.12);
+    }
+
+    function playSuccess() {
+      playTone(523, 0.1, 'sine', 0.15);
+      setTimeout(() => playTone(659, 0.1, 'sine', 0.15), 100);
+      setTimeout(() => playTone(784, 0.2, 'sine', 0.15), 200);
+    }
+
+    function playClear() {
+      playTone(300, 0.15, 'sawtooth', 0.08);
+    }
+
+    function toggleSound() {
+      soundOn = !soundOn;
+      const btn = document.getElementById('soundBtn');
+      btn.textContent = soundOn ? '🔊 Sound' : '🔇 Muted';
+      if (soundOn) playPop();
+    }
+
+    // ========== CONFETTI ==========
+    function launchConfetti() {
+      const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#1dd1a1', '#a29bfe', '#fd79a8'];
+      for (let i = 0; i < 40; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        piece.style.animationDelay = (Math.random() * 0.5) + 's';
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 4000);
+      }
+    }
+
+    // ========== COLORS ==========
+    const colors = [
+      '#FF6B6B', '#FF9F43', '#FECA57', '#1DD1A1', '#54A0FF',
+      '#5F27CD', '#FF9FF3', '#00D2D3', '#FF6348', '#2ED573',
+      '#A3CB38', '#FDA7DF', '#D980FA', '#B33771', '#6AB04C',
+      '#F8C291', '#FFFFFF', '#2F3542', '#A4B0BE', '#E17055'
+    ];
+
+    let currentColor = colors[0];
+    let currentPicture = 0;
+    let history = [];
+
+    // ========== 12 PICTURE TEMPLATES ==========
+    const pictures = [
+      // ===== Faces & People =====
+      {
+        name: "Smiley",
+        emoji: "😊",
+        svg: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle class="fillable" cx="100" cy="100" r="90" fill="#fff" stroke="#222" stroke-width="4"/>
+          <circle class="fillable" cx="70" cy="80" r="14" fill="#fff" stroke="#222" stroke-width="3"/>
+          <circle class="fillable" cx="130" cy="80" r="14" fill="#fff" stroke="#222" stroke-width="3"/>
+          <path class="fillable" d="M55 125 Q100 170 145 125" fill="#fff" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+          <circle class="outline" cx="70" cy="80" r="5" fill="#222"/>
+          <circle class="outline" cx="130" cy="80" r="5" fill="#222"/>
+        </svg>`
+      },
+      {
+        name: "Boy",
+        emoji: "👦",
+        svg: `<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- hair -->
+          <ellipse class="fillable" cx="100" cy="55" rx="55" ry="35" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <!-- face -->
+          <circle class="fillable" cx="100" cy="90" r="50" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- eyes -->
+          <circle class="fillable" cx="80" cy="85" r="10" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="fillable" cx="120" cy="85" r="10" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="80" cy="85" r="4" fill="#222"/>
+          <circle class="outline" cx="120" cy="85" r="4" fill="#222"/>
+          <!-- smile -->
+          <path class="outline" d="M80 110 Q100 130 120 110" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+          <!-- body -->
+          <path class="fillable" d="M60 140 L60 200 L140 200 L140 140 Q100 155 60 140" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- arms -->
+          <path class="fillable" d="M60 150 L30 180 L40 190 L70 160" fill="#fff" stroke="#222" stroke-width="2"/>
+          <path class="fillable" d="M140 150 L170 180 L160 190 L130 160" fill="#fff" stroke="#222" stroke-width="2"/>
+        </svg>`
+      },
+      {
+        name: "Girl",
+        emoji: "👧",
+        svg: `<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- hair left -->
+          <ellipse class="fillable" cx="55" cy="80" rx="25" ry="50" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <!-- hair right -->
+          <ellipse class="fillable" cx="145" cy="80" rx="25" ry="50" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <!-- hair top -->
+          <ellipse class="fillable" cx="100" cy="50" rx="50" ry="30" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <!-- face -->
+          <circle class="fillable" cx="100" cy="90" r="48" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- eyes -->
+          <circle class="fillable" cx="80" cy="85" r="9" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="fillable" cx="120" cy="85" r="9" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="80" cy="85" r="3.5" fill="#222"/>
+          <circle class="outline" cx="120" cy="85" r="3.5" fill="#222"/>
+          <!-- smile -->
+          <path class="outline" d="M82 110 Q100 128 118 110" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+          <!-- dress -->
+          <path class="fillable" d="M65 140 L50 200 L150 200 L135 140 Q100 155 65 140" fill="#fff" stroke="#222" stroke-width="3"/>
+        </svg>`
+      },
+      {
+        name: "Baby",
+        emoji: "👶",
+        svg: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- head -->
+          <circle class="fillable" cx="100" cy="100" r="70" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- eyes -->
+          <circle class="fillable" cx="75" cy="90" r="12" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="fillable" cx="125" cy="90" r="12" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="75" cy="90" r="5" fill="#222"/>
+          <circle class="outline" cx="125" cy="90" r="5" fill="#222"/>
+          <!-- cheeks -->
+          <circle class="fillable" cx="60" cy="115" r="12" fill="#fff" stroke="#222" stroke-width="1.5"/>
+          <circle class="fillable" cx="140" cy="115" r="12" fill="#fff" stroke="#222" stroke-width="1.5"/>
+          <!-- smile -->
+          <path class="outline" d="M75 125 Q100 150 125 125" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+          <!-- hair tuft -->
+          <path class="fillable" d="M90 35 Q100 15 110 35" fill="#fff" stroke="#222" stroke-width="2"/>
+        </svg>`
+      },
+      // ===== Animals =====
+      {
+        name: "Cat",
+        emoji: "🐱",
+        svg: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <ellipse class="fillable" cx="100" cy="110" rx="70" ry="60" fill="#fff" stroke="#222" stroke-width="3"/>
+          <path class="fillable" d="M40 70 L55 25 L80 65 Z" fill="#fff" stroke="#222" stroke-width="3"/>
+          <path class="fillable" d="M160 70 L145 25 L120 65 Z" fill="#fff" stroke="#222" stroke-width="3"/>
+          <path class="fillable" d="M50 65 L58 40 L72 60 Z" fill="#fff" stroke="#222" stroke-width="1.5"/>
+          <path class="fillable" d="M150 65 L142 40 L128 60 Z" fill="#fff" stroke="#222" stroke-width="1.5"/>
+          <ellipse class="fillable" cx="75" cy="100" rx="14" ry="18" fill="#fff" stroke="#222" stroke-width="2"/>
+          <ellipse class="fillable" cx="125" cy="100" rx="14" ry="18" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="75" cy="100" r="5" fill="#222"/>
+          <circle class="outline" cx="125" cy="100" r="5" fill="#222"/>
+          <ellipse class="fillable" cx="100" cy="125" rx="10" ry="7" fill="#fff" stroke="#222" stroke-width="2"/>
+          <path class="outline" d="M90 135 Q100 148 110 135" fill="none" stroke="#222" stroke-width="2"/>
+          <path class="outline" d="M100 132 L100 145" fill="none" stroke="#222" stroke-width="2"/>
+          <path class="outline" d="M30 120 H70 M30 130 H70 M30 140 H65" fill="none" stroke="#222" stroke-width="1.5"/>
+          <path class="outline" d="M130 120 H170 M130 130 H170 M135 140 H170" fill="none" stroke="#222" stroke-width="1.5"/>
+        </svg>`
+      },
+      {
+        name: "Dog",
+        emoji: "🐶",
+        svg: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- head -->
+          <ellipse class="fillable" cx="100" cy="100" rx="65" ry="55" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- ears -->
+          <ellipse class="fillable" cx="45" cy="70" rx="22" ry="35" transform="rotate(-20 45 70)" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="155" cy="70" rx="22" ry="35" transform="rotate(20 155 70)" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <!-- eyes -->
+          <circle class="fillable" cx="75" cy="90" r="12" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="fillable" cx="125" cy="90" r="12" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="75" cy="90" r="5" fill="#222"/>
+          <circle class="outline" cx="125" cy="90" r="5" fill="#222"/>
+          <!-- nose -->
+          <ellipse class="fillable" cx="100" cy="115" rx="14" ry="10" fill="#fff" stroke="#222" stroke-width="2"/>
+          <!-- mouth -->
+          <path class="outline" d="M90 125 Q100 140 110 125" fill="none" stroke="#222" stroke-width="2"/>
+          <!-- tongue -->
+          <ellipse class="fillable" cx="100" cy="140" rx="8" ry="10" fill="#fff" stroke="#222" stroke-width="1.5"/>
+        </svg>`
+      },
+      {
+        name: "Bunny",
+        emoji: "🐰",
+        svg: `<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- ears -->
+          <ellipse class="fillable" cx="70" cy="50" rx="18" ry="45" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="130" cy="50" rx="18" ry="45" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="70" cy="50" rx="8" ry="30" fill="#fff" stroke="#222" stroke-width="1.5"/>
+          <ellipse class="fillable" cx="130" cy="50" rx="8" ry="30" fill="#fff" stroke="#222" stroke-width="1.5"/>
+          <!-- head -->
+          <circle class="fillable" cx="100" cy="120" r="55" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- eyes -->
+          <circle class="fillable" cx="80" cy="110" r="10" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="fillable" cx="120" cy="110" r="10" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="80" cy="110" r="4" fill="#222"/>
+          <circle class="outline" cx="120" cy="110" r="4" fill="#222"/>
+          <!-- nose -->
+          <ellipse class="fillable" cx="100" cy="130" rx="8" ry="6" fill="#fff" stroke="#222" stroke-width="2"/>
+          <!-- mouth -->
+          <path class="outline" d="M92 138 Q100 150 108 138" fill="none" stroke="#222" stroke-width="2"/>
+          <!-- whiskers -->
+          <path class="outline" d="M60 125 H85 M60 135 H85 M115 125 H140 M115 135 H140" fill="none" stroke="#222" stroke-width="1.5"/>
+        </svg>`
+      },
+      {
+        name: "Elephant",
+        emoji: "🐘",
+        svg: `<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- body -->
+          <ellipse class="fillable" cx="120" cy="110" rx="70" ry="50" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- head -->
+          <circle class="fillable" cx="55" cy="90" r="40" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- ear -->
+          <ellipse class="fillable" cx="70" cy="70" rx="30" ry="35" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <!-- trunk -->
+          <path class="fillable" d="M25 100 Q5 130 20 160 Q30 170 40 155 Q25 130 40 105" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <!-- eye -->
+          <circle class="fillable" cx="45" cy="80" r="8" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="45" cy="80" r="3" fill="#222"/>
+          <!-- legs -->
+          <rect class="fillable" x="80" y="140" width="20" height="30" rx="5" fill="#fff" stroke="#222" stroke-width="2"/>
+          <rect class="fillable" x="140" y="140" width="20" height="30" rx="5" fill="#fff" stroke="#222" stroke-width="2"/>
+        </svg>`
+      },
+      {
+        name: "Lion",
+        emoji: "🦁",
+        svg: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- mane -->
+          <circle class="fillable" cx="100" cy="100" r="85" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- face -->
+          <circle class="fillable" cx="100" cy="105" r="50" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <!-- ears -->
+          <circle class="fillable" cx="60" cy="65" r="15" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="fillable" cx="140" cy="65" r="15" fill="#fff" stroke="#222" stroke-width="2"/>
+          <!-- eyes -->
+          <circle class="fillable" cx="80" cy="95" r="10" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="fillable" cx="120" cy="95" r="10" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="80" cy="95" r="4" fill="#222"/>
+          <circle class="outline" cx="120" cy="95" r="4" fill="#222"/>
+          <!-- nose -->
+          <ellipse class="fillable" cx="100" cy="115" rx="12" ry="8" fill="#fff" stroke="#222" stroke-width="2"/>
+          <!-- mouth -->
+          <path class="outline" d="M85 125 Q100 145 115 125" fill="none" stroke="#222" stroke-width="2.5"/>
+        </svg>`
+      },
+      {
+        name: "Penguin",
+        emoji: "🐧",
+        svg: `<svg viewBox="0 0 160 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- body -->
+          <ellipse class="fillable" cx="80" cy="130" rx="55" ry="70" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- belly -->
+          <ellipse class="fillable" cx="80" cy="140" rx="35" ry="50" fill="#fff" stroke="#222" stroke-width="2"/>
+          <!-- head -->
+          <circle class="fillable" cx="80" cy="55" r="35" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- eyes -->
+          <circle class="fillable" cx="68" cy="50" r="8" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="fillable" cx="92" cy="50" r="8" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="68" cy="50" r="3" fill="#222"/>
+          <circle class="outline" cx="92" cy="50" r="3" fill="#222"/>
+          <!-- beak -->
+          <path class="fillable" d="M72 62 L80 78 L88 62 Z" fill="#fff" stroke="#222" stroke-width="2"/>
+          <!-- feet -->
+          <ellipse class="fillable" cx="55" cy="200" rx="18" ry="10" fill="#fff" stroke="#222" stroke-width="2"/>
+          <ellipse class="fillable" cx="105" cy="200" rx="18" ry="10" fill="#fff" stroke="#222" stroke-width="2"/>
+          <!-- flippers -->
+          <ellipse class="fillable" cx="30" cy="130" rx="12" ry="30" transform="rotate(-20 30 130)" fill="#fff" stroke="#222" stroke-width="2"/>
+          <ellipse class="fillable" cx="130" cy="130" rx="12" ry="30" transform="rotate(20 130 130)" fill="#fff" stroke="#222" stroke-width="2"/>
+        </svg>`
+      },
+      {
+        name: "Bird",
+        emoji: "🐦",
+        svg: `<svg viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+          <!-- body -->
+          <ellipse class="fillable" cx="100" cy="100" rx="50" ry="40" fill="#fff" stroke="#222" stroke-width="3"/>
+          <!-- head -->
+          <circle class="fillable" cx="145" cy="75" r="28" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <!-- wing -->
+          <ellipse class="fillable" cx="90" cy="95" rx="30" ry="20" transform="rotate(-20 90 95)" fill="#fff" stroke="#222" stroke-width="2"/>
+          <!-- beak -->
+          <path class="fillable" d="M170 75 L195 80 L170 90 Z" fill="#fff" stroke="#222" stroke-width="2"/>
+          <!-- eye -->
+          <circle class="fillable" cx="150" cy="70" r="7" fill="#fff" stroke="#222" stroke-width="1.5"/>
+          <circle class="outline" cx="152" cy="70" r="3" fill="#222"/>
+          <!-- tail -->
+          <path class="fillable" d="M55 100 L20 80 L25 110 L20 130 Z" fill="#fff" stroke="#222" stroke-width="2"/>
+          <!-- feet -->
+          <path class="outline" d="M90 140 L85 160 M90 140 L95 160 M110 140 L105 160 M110 140 L115 160" fill="none" stroke="#222" stroke-width="2"/>
+        </svg>`
+      },
+      {
+        name: "Fish",
+        emoji: "🐠",
+        svg: `<svg viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg">
+          <ellipse class="fillable" cx="110" cy="80" rx="70" ry="45" fill="#fff" stroke="#222" stroke-width="3"/>
+          <path class="fillable" d="M40 80 L10 40 L10 120 Z" fill="#fff" stroke="#222" stroke-width="3"/>
+          <path class="fillable" d="M90 40 Q110 10 130 40" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <path class="fillable" d="M90 120 Q110 145 130 120" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <circle class="fillable" cx="155" cy="70" r="12" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="158" cy="70" r="5" fill="#222"/>
+          <path class="outline" d="M140 60 Q130 80 140 100" fill="none" stroke="#222" stroke-width="2"/>
+          <circle class="fillable" cx="185" cy="40" r="8" fill="#fff" stroke="#222" stroke-width="1.5"/>
+          <circle class="fillable" cx="200" cy="55" r="5" fill="#fff" stroke="#222" stroke-width="1.5"/>
+        </svg>`
+      },
+      // ===== Other fun =====
+      {
+        name: "House",
+        emoji: "🏠",
+        svg: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <rect class="fillable" x="5" y="5" width="190" height="190" rx="8" fill="#fff" stroke="#222" stroke-width="2"/>
+          <path class="fillable" d="M20 90 L100 25 L180 90 Z" fill="#fff" stroke="#222" stroke-width="3"/>
+          <rect class="fillable" x="40" y="90" width="120" height="90" fill="#fff" stroke="#222" stroke-width="3"/>
+          <rect class="fillable" x="80" y="120" width="40" height="60" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <circle class="outline" cx="110" cy="150" r="4" fill="#222"/>
+          <rect class="fillable" x="50" y="105" width="25" height="25" fill="#fff" stroke="#222" stroke-width="2"/>
+          <path class="outline" d="M62.5 105 V130 M50 117.5 H75" fill="none" stroke="#222" stroke-width="1.5"/>
+          <rect class="fillable" x="125" y="105" width="25" height="25" fill="#fff" stroke="#222" stroke-width="2"/>
+          <path class="outline" d="M137.5 105 V130 M125 117.5 H150" fill="none" stroke="#222" stroke-width="1.5"/>
+          <rect class="fillable" x="130" y="40" width="20" height="40" fill="#fff" stroke="#222" stroke-width="2"/>
+        </svg>`
+      },
+      {
+        name: "Flower",
+        emoji: "🌸",
+        svg: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <ellipse class="fillable" cx="100" cy="50" rx="26" ry="32" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="145" cy="75" rx="26" ry="32" transform="rotate(60 145 75)" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="145" cy="125" rx="26" ry="32" transform="rotate(120 145 125)" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="100" cy="150" rx="26" ry="32" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="55" cy="125" rx="26" ry="32" transform="rotate(60 55 125)" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="55" cy="75" rx="26" ry="32" transform="rotate(120 55 75)" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <circle class="fillable" cx="100" cy="100" r="26" fill="#fff" stroke="#222" stroke-width="3"/>
+          <path class="outline" d="M100 126 L100 190" fill="none" stroke="#222" stroke-width="4"/>
+          <ellipse class="fillable" cx="75" cy="160" rx="16" ry="9" transform="rotate(-30 75 160)" fill="#fff" stroke="#222" stroke-width="2"/>
+        </svg>`
+      },
+      {
+        name: "Car",
+        emoji: "🚗",
+        svg: `<svg viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg">
+          <path class="fillable" d="M20 90 L40 50 L100 40 L160 50 L190 90 L200 90 L200 120 L20 120 Z" fill="#fff" stroke="#222" stroke-width="3"/>
+          <path class="fillable" d="M50 90 L60 55 L100 48 L145 55 L160 90 Z" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <path class="outline" d="M105 48 V90" fill="none" stroke="#222" stroke-width="2"/>
+          <circle class="fillable" cx="60" cy="120" r="22" fill="#fff" stroke="#222" stroke-width="3"/>
+          <circle class="fillable" cx="160" cy="120" r="22" fill="#fff" stroke="#222" stroke-width="3"/>
+          <circle class="outline" cx="60" cy="120" r="10" fill="#222"/>
+          <circle class="outline" cx="160" cy="120" r="10" fill="#222"/>
+          <ellipse class="fillable" cx="185" cy="95" rx="8" ry="6" fill="#fff" stroke="#222" stroke-width="2"/>
+          <rect class="outline" x="115" y="95" width="12" height="5" rx="2" fill="#222"/>
+        </svg>`
+      },
+      {
+        name: "Rocket",
+        emoji: "🚀",
+        svg: `<svg viewBox="0 0 160 220" xmlns="http://www.w3.org/2000/svg">
+          <path class="fillable" d="M50 60 L50 160 Q50 180 80 190 Q110 180 110 160 L110 60 Z" fill="#fff" stroke="#222" stroke-width="3"/>
+          <path class="fillable" d="M50 60 Q80 10 110 60" fill="#fff" stroke="#222" stroke-width="3"/>
+          <circle class="fillable" cx="80" cy="90" r="18" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <circle class="fillable" cx="80" cy="90" r="10" fill="#fff" stroke="#222" stroke-width="1.5"/>
+          <path class="fillable" d="M50 140 L20 170 L50 160 Z" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <path class="fillable" d="M110 140 L140 170 L110 160 Z" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <path class="fillable" d="M60 190 Q80 220 100 190" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <path class="fillable" d="M70 190 Q80 210 90 190" fill="#fff" stroke="#222" stroke-width="2"/>
+        </svg>`
+      },
+      {
+        name: "Ice Cream",
+        emoji: "🍦",
+        svg: `<svg viewBox="0 0 160 220" xmlns="http://www.w3.org/2000/svg">
+          <circle class="fillable" cx="80" cy="70" r="45" fill="#fff" stroke="#222" stroke-width="3"/>
+          <circle class="fillable" cx="80" cy="110" r="40" fill="#fff" stroke="#222" stroke-width="3"/>
+          <path class="fillable" d="M45 140 L80 210 L115 140 Z" fill="#fff" stroke="#222" stroke-width="3"/>
+          <path class="outline" d="M55 155 L80 195 L105 155" fill="none" stroke="#222" stroke-width="1.5"/>
+          <path class="outline" d="M62 170 L80 200 L98 170" fill="none" stroke="#222" stroke-width="1.5"/>
+          <circle class="fillable" cx="80" cy="35" r="12" fill="#fff" stroke="#222" stroke-width="2"/>
+          <path class="outline" d="M80 23 Q90 10 95 20" fill="none" stroke="#222" stroke-width="2"/>
+        </svg>`
+      },
+      {
+        name: "Butterfly",
+        emoji: "🦋",
+        svg: `<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
+          <ellipse class="fillable" cx="55" cy="60" rx="40" ry="35" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="50" cy="120" rx="35" ry="30" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="165" cy="60" rx="40" ry="35" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="170" cy="120" rx="35" ry="30" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <ellipse class="fillable" cx="110" cy="90" rx="12" ry="50" fill="#fff" stroke="#222" stroke-width="2.5"/>
+          <circle class="fillable" cx="110" cy="40" r="14" fill="#fff" stroke="#222" stroke-width="2"/>
+          <path class="outline" d="M105 30 Q95 10 90 15" fill="none" stroke="#222" stroke-width="2"/>
+          <path class="outline" d="M115 30 Q125 10 130 15" fill="none" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="90" cy="15" r="3" fill="#222"/>
+          <circle class="outline" cx="130" cy="15" r="3" fill="#222"/>
+        </svg>`
+      },
+      {
+        name: "Star",
+        emoji: "⭐",
+        svg: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <polygon class="fillable" points="100,15 120,75 185,75 135,115 155,180 100,140 45,180 65,115 15,75 80,75" fill="#fff" stroke="#222" stroke-width="3"/>
+          <circle class="fillable" cx="100" cy="105" r="25" fill="#fff" stroke="#222" stroke-width="2"/>
+        </svg>`
+      },
+      {
+        name: "Heart",
+        emoji: "❤️",
+        svg: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path class="fillable" d="M100 170 C20 110 20 50 60 40 C85 35 100 55 100 55 C100 55 115 35 140 40 C180 50 180 110 100 170 Z" fill="#fff" stroke="#222" stroke-width="3"/>
+          <circle class="fillable" cx="75" cy="75" r="12" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="fillable" cx="125" cy="75" r="12" fill="#fff" stroke="#222" stroke-width="2"/>
+        </svg>`
+      },
+      {
+        name: "Sun",
+        emoji: "☀️",
+        svg: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle class="fillable" cx="100" cy="100" r="45" fill="#fff" stroke="#222" stroke-width="3"/>
+          <rect class="fillable" x="92" y="10" width="16" height="30" rx="4" fill="#fff" stroke="#222" stroke-width="2"/>
+          <rect class="fillable" x="92" y="160" width="16" height="30" rx="4" fill="#fff" stroke="#222" stroke-width="2"/>
+          <rect class="fillable" x="10" y="92" width="30" height="16" rx="4" fill="#fff" stroke="#222" stroke-width="2"/>
+          <rect class="fillable" x="160" y="92" width="30" height="16" rx="4" fill="#fff" stroke="#222" stroke-width="2"/>
+          <rect class="fillable" x="30" y="30" width="16" height="28" rx="4" transform="rotate(-45 38 44)" fill="#fff" stroke="#222" stroke-width="2"/>
+          <rect class="fillable" x="154" y="30" width="16" height="28" rx="4" transform="rotate(45 162 44)" fill="#fff" stroke="#222" stroke-width="2"/>
+          <rect class="fillable" x="30" y="142" width="16" height="28" rx="4" transform="rotate(45 38 156)" fill="#fff" stroke="#222" stroke-width="2"/>
+          <rect class="fillable" x="154" y="142" width="16" height="28" rx="4" transform="rotate(-45 162 156)" fill="#fff" stroke="#222" stroke-width="2"/>
+          <circle class="outline" cx="85" cy="90" r="5" fill="#222"/>
+          <circle class="outline" cx="115" cy="90" r="5" fill="#222"/>
+          <path class="outline" d="M85 115 Q100 130 115 115" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+        </svg>`
+      }
+    ];
+
+    // ========== INIT ==========
+    function init() {
+      buildGallery();
+      buildPalette();
+      loadPicture(0);
+    }
+
+    function buildGallery() {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = pictures.map((p, i) => `
+        <div class="gallery-item ${i === 0 ? 'active' : ''}" onclick="loadPicture(${i})" title="${p.name}">
+          <span>${p.emoji}</span>
+        </div>
+      `).join('');
+    }
+
+    function buildPalette() {
+      const palette = document.getElementById('palette');
+      palette.innerHTML = colors.map((c, i) => `
+        <button class="color-btn ${i === 0 ? 'active' : ''}" 
+                style="background:${c}; ${c === '#FFFFFF' ? 'border:2px solid #ccc;' : ''}"
+                onclick="selectColor('${c}', this)"
+                title="${c}"></button>
+      `).join('');
+    }
+
+    function selectColor(color, btn) {
+      currentColor = color;
+      document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      playPop();
+    }
+
+    function loadPicture(index) {
+      currentPicture = index;
+      history = [];
+      document.querySelectorAll('.gallery-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+      const container = document.getElementById('drawing');
+      container.innerHTML = pictures[index].svg;
+      const svg = container.querySelector('svg');
+      svg.querySelectorAll('.fillable').forEach(el => {
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          history.push({ el: el, prev: el.getAttribute('fill') || '#fff' });
+          if (history.length > 60) history.shift();
+          el.setAttribute('fill', currentColor);
+          playPop();
+        });
+      });
+      playTone(400, 0.08, 'sine', 0.1);
+    }
+
+    function undo() {
+      if (history.length === 0) return;
+      const last = history.pop();
+      last.el.setAttribute('fill', last.prev);
+      playTone(350, 0.08, 'triangle', 0.1);
+    }
+
+    function clearColors() {
+      const container = document.getElementById('drawing');
+      container.querySelectorAll('.fillable').forEach(el => {
+        el.setAttribute('fill', '#fff');
+      });
+      history = [];
+      playClear();
+    }
+
+    function randomColors() {
+      const container = document.getElementById('drawing');
+      const fills = container.querySelectorAll('.fillable');
+      fills.forEach(el => {
+        history.push({ el, prev: el.getAttribute('fill') || '#fff' });
+        const randomColor = colors[Math.floor(Math.random() * (colors.length - 4))];
+        el.setAttribute('fill', randomColor);
+      });
+      playSuccess();
+      launchConfetti();
+    }
+
+    function downloadImage() {
+      const svg = document.querySelector('#drawing svg');
+      const serializer = new XMLSerializer();
+      let source = serializer.serializeToString(svg);
+      if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+      }
+      source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+      const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `my-coloring-${pictures[currentPicture].name.toLowerCase()}.svg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      playSuccess();
+      launchConfetti();
+      showToast('Picture saved! 🎉');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    // Start
+    init();
+  </script>
+</body>
+</html>
